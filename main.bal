@@ -107,57 +107,17 @@ json[] conferences = [
 listener http:Listener httpListener = new (9090);
 
 // GET - Retrieve all conferences
-service /conferences on httpListener {
-    resource function get getAllConferences() returns json {
-        return conferences;
+service / on httpListener {
+
+     resource function get conferences() returns json { 
+        return conferences; 
     }
 
-    // GET - Retrieve conference by ID
-    resource function get getConferenceById(http:Request req, int id) returns json {
-        foreach var conference in conferences {
+    resource function get conferences/[int id]() returns json { 
+         foreach var conference in conferences {
             if (conference.id == id) {
                 return conference;
             }
-        }
-    }
-    // POST - Create a new conference
-    resource function post addConference(http:Request req, map<json> conference) returns json {
-        // Generate a unique ID for the new conference
-        int nextId = conferences.length() + 1;
-        var conferenceMap = <map<json>>conference;
-        conferenceMap["id"] = nextId;
-        conferences.push(conference);
-        return conference;
-    }
-    // PUT - Update an existing conference
-    resource function put updateConference(http:Request req, int id, map<json> updatedConference) returns json|error? {
-        foreach var conference in conferences {
-            if (conference.id == id) {
-                // Update the conference details
-                var conferenceMap = <map<json>>conference;
-                conferenceMap["name"] = check updatedConference.name;
-                conferenceMap["location"] = check updatedConference.location;
-                conferenceMap["date"] = check updatedConference.date;
-                return conference;
-            }
-        }
-        return ();
-    }
-
-    // DELETE - Delete a conference by ID
-    resource function delete deleteConference(http:Request req, int id) returns json {
-        int index = -1;
-        foreach var conf in conferences {
-            if (conf.id == id) {
-                index = <int>conferences.indexOf(conf);
-                break;
-            }
-        }
-
-        if (index >= 0) {
-            // Remove the conference from the dataset
-            json deletedConference = conferences.remove(index);
-            return deletedConference;
         }
         return ();
     }
